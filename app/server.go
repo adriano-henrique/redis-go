@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -29,13 +31,22 @@ func handleConnection(conn net.Conn) {
 	for {
 		readBuffer := make([]byte, 1024)
 		_, err := conn.Read(readBuffer)
+		if err == io.EOF {
+			return
+		}
 		if err != nil {
-			fmt.Println("Unable to read message from connection")
+			fmt.Println("Got an error when trying to read: ", err.Error())
 			os.Exit(1)
 		}
 
-		_, err = conn.Write([]byte("+PONG\r\n"))
-		if err != nil {
+		requestContent := string(readBuffer)
+		var response []byte
+		if strings.Contains(strings.ToLower(requestContent), "ping") {
+			response = []byte("+PONG\r\n")
+		}
+
+		n, err := conn.Write(response)
+		if err != nil || n != len(response) {
 			fmt.Println("found an error trying to respond")
 			return
 		}
