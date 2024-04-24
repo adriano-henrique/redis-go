@@ -14,6 +14,7 @@ func main() {
 		os.Exit(1)
 	}
 	defer l.Close()
+	redisStorage := StartRedisStorage()
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -21,11 +22,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		go handleConnection(conn)
+		go handleConnection(conn, redisStorage)
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn, storage *RedisStorage) {
 	defer conn.Close()
 	for {
 		readBuffer := make([]byte, 1024)
@@ -40,7 +41,7 @@ func handleConnection(conn net.Conn) {
 
 		requestContent := string(readBuffer)
 		requestElements := ParseRequest(requestContent)
-		responses := ParseElements(requestElements)
+		responses := ParseElements(requestElements, storage)
 		fmt.Println(responses)
 
 		for _, response := range responses {
