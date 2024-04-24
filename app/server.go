@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -40,15 +39,17 @@ func handleConnection(conn net.Conn) {
 		}
 
 		requestContent := string(readBuffer)
-		var response []byte
-		if strings.Contains(strings.ToLower(requestContent), "ping") {
-			response = []byte("+PONG\r\n")
-		}
+		requestElements := ParseRequest(requestContent)
+		responses := ParseElements(requestElements)
+		fmt.Println(responses)
 
-		n, err := conn.Write(response)
-		if err != nil || n != len(response) {
-			fmt.Println("found an error trying to respond")
-			return
+		for _, response := range responses {
+			res := []byte(response)
+			n, err := conn.Write(res)
+			if err != nil || n != len(response) {
+				fmt.Println("found an error trying to respond")
+				return
+			}
 		}
 	}
 }
