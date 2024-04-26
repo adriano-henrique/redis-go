@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var validOperations = []string{"ping", "echo", "get", "set"}
+var defaultTime = time.Unix(0, 0)
 
 func ParseElements(elements []string, storage *RedisStorage) []string {
 	var responses []string
@@ -63,10 +66,19 @@ func handleGet(index int, elements []string, storage *RedisStorage) (string, err
 		return "", errors.New("expected to have peek element (key to get from storage)")
 	}
 	keyElement := elements[index+1]
-	value, err := storage.Get(keyElement)
+	object, err := storage.Get(keyElement)
+	fmt.Println("Got: ", object.value)
+	fmt.Println("Got: ", object.expiry.String())
 	if err != nil {
 		return "$-1\r\n", nil
 	}
+
+	if object.hasExpired() {
+		storage.Delete(keyElement)
+		return "$-1\r\n", nil
+	}
+
+	value := object.value
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(value), value), nil
 }
 
@@ -76,6 +88,27 @@ func handleSet(index int, elements []string, storage *RedisStorage) (string, err
 	}
 	keyElement := elements[index+1]
 	valueElement := elements[index+2]
-	storage.Set(keyElement, valueElement)
+	if index+3 < len(elements) && elements[index+3] == "px" {
+		if index+4 >= len(elements) {
+			return "", errors.New("should have timeout value if has px command")
+		}
+
+		timeout, err := strconv.Atoi(elements[index+4])
+		if err != nil {
+			return "", err
+		}
+		milisecondsAdded := time.Duration(timeout) * time.Millisecond
+		object := StorageObject{
+			value:  valueElement,
+			expiry: time.Now().Add(milisecondsAdded),
+		}
+		storage.Set(keyElement, object)
+		return "+OK\r\n", nil
+	}
+	storedObject := StorageObject{
+		value:  valueElement,
+		expiry: defaultTime,
+	}
+	storage.Set(keyElement, storedObject)
 	return "+OK\r\n", nil
 }
