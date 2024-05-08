@@ -1,4 +1,4 @@
-package operations
+package utils
 
 import (
 	"errors"
@@ -17,6 +17,13 @@ const (
 type RedisResponse struct {
 	responseType ResponseType
 	elements     []string
+}
+
+func NewRedisResponse(responseType ResponseType, elements []string) *RedisResponse {
+	return &RedisResponse{
+		responseType: responseType,
+		elements:     elements,
+	}
 }
 
 func (rs *RedisResponse) GetEncodedResponse() (string, error) {

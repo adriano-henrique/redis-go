@@ -6,10 +6,12 @@ import (
 	"io"
 	"net"
 	"os"
+
+	"github.com/codecrafters-io/redis-starter-go/app/utils"
 )
 
 func main() {
-	redisStorage := StartRedisStorage()
+	redisStorage := utils.StartRedisStorage()
 	redisConfig := StartRedisConfig()
 
 	var portFlag string
@@ -41,7 +43,7 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn, storage *RedisStorage, config *RedisConfig) {
+func handleConnection(conn net.Conn, storage *utils.RedisStorage, config *RedisConfig) {
 	defer conn.Close()
 	for {
 		readBuffer := make([]byte, 1024)

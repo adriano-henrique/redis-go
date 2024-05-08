@@ -1,4 +1,6 @@
-package operations
+package utils
+
+import "time"
 
 func EmptyList() []string {
 	var emptyList []string
@@ -17,4 +19,8 @@ func OkResponse() *RedisResponse {
 		responseType: Ok,
 		elements:     EmptyList(),
 	}
+}
+
+func DefaultTime() time.Time {
+	return time.Unix(0, 0)
 }

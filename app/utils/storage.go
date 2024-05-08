@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"errors"
@@ -10,7 +10,9 @@ type StorageObject struct {
 	expiry time.Time
 }
 
-func (object StorageObject) hasExpired() bool {
+var defaultTime = time.Unix(0, 0)
+
+func (object StorageObject) HasExpired() bool {
 	if object.expiry.Compare(defaultTime) == 0 {
 		return false
 	}
@@ -19,6 +21,21 @@ func (object StorageObject) hasExpired() bool {
 		return true
 	}
 	return false
+}
+
+func (object StorageObject) Value() string {
+	return object.value
+}
+
+func (object StorageObject) Expiry() time.Time {
+	return object.expiry
+}
+
+func NewStorageObject(value string, expiry time.Time) *StorageObject {
+	return &StorageObject{
+		value:  value,
+		expiry: expiry,
+	}
 }
 
 type RedisStorage struct {
@@ -41,7 +58,7 @@ func (rs *RedisStorage) Delete(key string) {
 	delete(rs.data, key)
 }
 
-func (rs *RedisStorage) Set(key string, value StorageObject) error {
-	rs.data[key] = value
+func (rs *RedisStorage) Set(key string, value *StorageObject) error {
+	rs.data[key] = *value
 	return nil
 }
