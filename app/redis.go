@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var validOperations = []string{"ping", "echo", "get", "set"}
+var validOperations = []string{"ping", "echo", "get", "set", "info"}
 var defaultTime = time.Unix(0, 0)
 
 func ParseElements(elements []string, storage *RedisStorage) []string {
@@ -40,6 +40,13 @@ func ParseElements(elements []string, storage *RedisStorage) []string {
 				response, err := handleSet(i, elements, storage)
 				if err != nil {
 					fmt.Println("Error during operation parsing: ", err.Error())
+					os.Exit(1)
+				}
+				responses = append(responses, response)
+			case "info":
+				response, err := handleInfo()
+				if err != nil {
+					fmt.Println("Error during operation partsing: ", err.Error())
 					os.Exit(1)
 				}
 				responses = append(responses, response)
@@ -111,4 +118,8 @@ func handleSet(index int, elements []string, storage *RedisStorage) (string, err
 	}
 	storage.Set(keyElement, storedObject)
 	return "+OK\r\n", nil
+}
+
+func handleInfo() (string, error) {
+	return "$11\r\nrole:master\r\n", nil
 }
