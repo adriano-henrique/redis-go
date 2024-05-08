@@ -8,20 +8,31 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/codecrafters-io/redis-starter-go/app/operations"
 )
 
 var validOperations = []string{"ping", "echo", "get", "set", "info"}
 var defaultTime = time.Unix(0, 0)
 
-func ParseElements(elements []string, storage *RedisStorage) []string {
+func AppendResponse(responses *[]string, operation operations.RedisOperation) {
+	response, err := operation.HandleOperation()
+	if err != nil {
+		fmt.Println("Error during operation partsing: ", err.Error())
+		os.Exit(1)
+	}
+	*responses = append(*responses, response)
+}
+
+func ParseElements(elements []string, storage *RedisStorage, config *RedisConfig) []string {
 	var responses []string
 	for i, element := range elements {
 		lowerCaseValue := strings.ToLower(element)
 		if len(strings.Split(element, " ")) == 1 && slices.Contains(validOperations, lowerCaseValue) {
 			switch command := lowerCaseValue; command {
 			case "ping":
-				response := handlePing()
-				responses = append(responses, response)
+				pingOperation := operations.PingOperation{}
+				AppendResponse(&responses, pingOperation)
 			case "echo":
 				response, err := handleEcho(i, elements)
 				if err != nil {
@@ -44,7 +55,7 @@ func ParseElements(elements []string, storage *RedisStorage) []string {
 				}
 				responses = append(responses, response)
 			case "info":
-				response, err := handleInfo()
+				response, err := handleInfo(config)
 				if err != nil {
 					fmt.Println("Error during operation partsing: ", err.Error())
 					os.Exit(1)
@@ -120,6 +131,7 @@ func handleSet(index int, elements []string, storage *RedisStorage) (string, err
 	return "+OK\r\n", nil
 }
 
-func handleInfo() (string, error) {
+func handleInfo(config *RedisConfig) (string, error) {
+
 	return "$11\r\nrole:master\r\n", nil
 }
