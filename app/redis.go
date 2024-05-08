@@ -21,7 +21,7 @@ func AppendResponse(responses *[]string, operation operations.RedisOperation) {
 	*responses = append(*responses, response)
 }
 
-func ParseElements(elements []string, storage *utils.RedisStorage, config *RedisConfig) []string {
+func ParseElements(elements []string, storage *utils.RedisStorage, config *utils.RedisConfig) []string {
 	var responses []string
 	for i, element := range elements {
 		lowerCaseValue := strings.ToLower(element)
@@ -40,19 +40,10 @@ func ParseElements(elements []string, storage *utils.RedisStorage, config *Redis
 				setOperation := operations.NewSetOperation(i, elements, storage)
 				AppendResponse(&responses, setOperation)
 			case "info":
-				response, err := handleInfo(config)
-				if err != nil {
-					fmt.Println("Error during operation partsing: ", err.Error())
-					os.Exit(1)
-				}
-				responses = append(responses, response)
+				infoOperation := operations.NewInfoOperation(config)
+				AppendResponse(&responses, infoOperation)
 			}
 		}
 	}
 	return responses
-}
-
-func handleInfo(config *RedisConfig) (string, error) {
-
-	return "$11\r\nrole:master\r\n", nil
 }

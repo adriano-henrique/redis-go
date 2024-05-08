@@ -2,13 +2,17 @@ package operations
 
 import "github.com/codecrafters-io/redis-starter-go/app/utils"
 
-type InfoOperation struct{}
+type InfoOperation struct {
+	config *utils.RedisConfig
+}
 
-func NewInfoOperation() *InfoOperation {
-	return &InfoOperation{}
+func NewInfoOperation(config *utils.RedisConfig) *InfoOperation {
+	return &InfoOperation{
+		config: config,
+	}
 }
 
 func (io InfoOperation) HandleOperation() (string, error) {
-	infoResponse := utils.NewRedisResponse(utils.SingleElement, []string{"role:master"})
+	infoResponse := utils.NewRedisResponse(utils.SingleElement, []string{io.config.GetRoleInfoString()})
 	return infoResponse.GetEncodedResponse()
 }

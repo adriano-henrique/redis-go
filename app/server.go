@@ -12,25 +12,23 @@ import (
 
 func main() {
 	redisStorage := utils.StartRedisStorage()
-	redisConfig := StartRedisConfig()
+	redisConfig := utils.StartRedisConfig()
 
 	var portFlag string
 	flag.StringVar(&portFlag, "port", "6379", "The port in which you wish to bind the redis service to")
 
+	replicaOf := flag.String("replicaof", "", "replicate to another redis server")
+	flag.Parse()
+
+	if *replicaOf != "" {
+		redisConfig.SetIsReplica(true)
+	}
 	l, err := net.Listen("tcp", "0.0.0.0:"+portFlag)
 	if err != nil {
 		fmt.Println("Failed to bind to port " + portFlag)
 		os.Exit(1)
 	}
 	defer l.Close()
-
-	var replicaOf string
-	flag.StringVar(&replicaOf, "replicaof", "", "The redis instance you wish to make this a slave to")
-	if replicaOf != "" {
-		redisConfig.SetIsReplica(true)
-	}
-
-	flag.Parse()
 
 	for {
 		conn, err := l.Accept()
@@ -43,7 +41,7 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn, storage *utils.RedisStorage, config *RedisConfig) {
+func handleConnection(conn net.Conn, storage *utils.RedisStorage, config *utils.RedisConfig) {
 	defer conn.Close()
 	for {
 		readBuffer := make([]byte, 1024)
