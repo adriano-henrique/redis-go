@@ -3,7 +3,9 @@ package utils
 import "fmt"
 
 type RedisConfig struct {
-	isReplica bool
+	isReplica        bool
+	masterReplId     string
+	masterReplOffset int
 }
 
 func (rs *RedisConfig) SetIsReplica(isReplica bool) {
@@ -11,7 +13,15 @@ func (rs *RedisConfig) SetIsReplica(isReplica bool) {
 }
 
 func StartRedisConfig() *RedisConfig {
-	return &RedisConfig{isReplica: false}
+	return &RedisConfig{
+		isReplica:        false,
+		masterReplId:     "",
+		masterReplOffset: 0,
+	}
+}
+
+func (rs *RedisConfig) ConfigRedis() {
+	rs.masterReplId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
 }
 
 func (rs RedisConfig) getRole() string {
@@ -23,4 +33,12 @@ func (rs RedisConfig) getRole() string {
 
 func (rs RedisConfig) GetRoleInfoString() string {
 	return fmt.Sprintf("role:%s", rs.getRole())
+}
+
+func (rs RedisConfig) GetMasterReplIdString() string {
+	return fmt.Sprintf("master_replid:%s", rs.masterReplId)
+}
+
+func (rs RedisConfig) GetMasterReplOffsetString() string {
+	return fmt.Sprintf("master_repl_offset:%d", rs.masterReplOffset)
 }

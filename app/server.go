@@ -23,6 +23,7 @@ func main() {
 	if *replicaOf != "" {
 		redisConfig.SetIsReplica(true)
 	}
+	redisConfig.ConfigRedis()
 	l, err := net.Listen("tcp", "0.0.0.0:"+portFlag)
 	if err != nil {
 		fmt.Println("Failed to bind to port " + portFlag)
