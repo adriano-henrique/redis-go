@@ -23,6 +23,6 @@ func (eo EchoOperation) HandleOperation() (string, error) {
 		return "", errors.New("should have a peek element (string to be echoed)")
 	}
 	peekElement := eo.elements[eo.index+1]
-	echoResponse := utils.NewRedisResponse(utils.SingleElement, []string{peekElement})
+	echoResponse := utils.NewRedisResponse(utils.BulkString, []string{peekElement})
 	return echoResponse.GetEncodedResponse()
 }

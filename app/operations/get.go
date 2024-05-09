@@ -38,6 +38,6 @@ func (gop GetOperation) HandleOperation() (string, error) {
 		return "$-1\r\n", nil
 	}
 
-	getResponse := utils.NewRedisResponse(utils.SingleElement, []string{object.Value()})
+	getResponse := utils.NewRedisResponse(utils.BulkString, []string{object.Value()})
 	return getResponse.GetEncodedResponse()
 }

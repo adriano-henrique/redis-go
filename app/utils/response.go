@@ -12,7 +12,7 @@ const (
 	Ok ResponseType = iota
 	Pong
 	Invalid
-	SingleElement
+	BulkString
 	ArrayResponse
 )
 
@@ -36,7 +36,7 @@ func (rs *RedisResponse) GetEncodedResponse() (string, error) {
 		return "$-1\r\n", nil
 	case Pong:
 		return "+PONG\r\n", nil
-	case SingleElement:
+	case BulkString:
 		if len(rs.elements) == 0 {
 			return "", errors.New("elements to build the response should be passed")
 		}

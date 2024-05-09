@@ -17,7 +17,7 @@ func NewInfoOperation(config *utils.RedisConfig) *InfoOperation {
 }
 
 func (io InfoOperation) HandleOperation() (string, error) {
-	infoResponse := utils.NewRedisResponse(utils.SingleElement, []string{io.buildResponseString()})
+	infoResponse := utils.NewRedisResponse(utils.BulkString, []string{io.buildResponseString()})
 	return infoResponse.GetEncodedResponse()
 }
 
