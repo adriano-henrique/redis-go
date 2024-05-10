@@ -21,6 +21,8 @@ func OpenConnection(masterHostAddress string, port string) {
 	conn.Write(writeBulkString([]string{"REPLCONF", "listening-port", port}))
 	reader.ReadString('\n')
 	conn.Write(writeBulkString([]string{"REPLCONF", "capa", "psync2"}))
+	reader.ReadString('\n')
+	conn.Write(writeBulkString([]string{"PSYNC", "?", "-1"}))
 }
 
 func writeBulkString(elements []string) []byte {
