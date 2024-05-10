@@ -29,7 +29,7 @@ func main() {
 			os.Exit(1)
 		}
 		redisConfig.SetMasterHostAddress(strings.Join([]string{*replicaOf, flag.Args()[0]}, ":"))
-		connection.OpenConnection(redisConfig.MasterHost)
+		connection.OpenConnection(redisConfig.MasterHost, portFlag)
 	}
 	redisConfig.ConfigRedis()
 	l, err := net.Listen("tcp", "0.0.0.0:"+portFlag)

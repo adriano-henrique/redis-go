@@ -1,31 +1,26 @@
 package connection
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"strings"
 )
 
-func OpenConnection(masterHostAddress string) {
+func OpenConnection(masterHostAddress string, port string) {
 	conn, err := net.Dial("tcp", masterHostAddress)
 	if err != nil {
 		fmt.Println("Faild to connect to master " + masterHostAddress)
 		return
 	}
 	defer conn.Close()
-	err = sendPing(conn)
-	if err != nil {
-		fmt.Println("Failed to send ping to master " + masterHostAddress)
-		return
-	}
-}
-
-func sendPing(conn net.Conn) error {
-	_, err := conn.Write(writeBulkString([]string{"PING"}))
-	if err != nil {
-		return err
-	}
-	return nil
+	reader := bufio.NewReader(conn)
+	// initial handshake
+	conn.Write(writeBulkString([]string{"PING"}))
+	reader.ReadString('\n')
+	conn.Write(writeBulkString([]string{"REPLCONF", "listening-port", port}))
+	reader.ReadString('\n')
+	conn.Write(writeBulkString([]string{"REPLCONF", "capa", "psync2"}))
 }
 
 func writeBulkString(elements []string) []byte {
