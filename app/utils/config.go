@@ -4,6 +4,7 @@ import "fmt"
 
 type RedisConfig struct {
 	isReplica        bool
+	MasterHost       string
 	masterReplId     string
 	masterReplOffset int
 }
@@ -12,9 +13,14 @@ func (rs *RedisConfig) SetIsReplica(isReplica bool) {
 	rs.isReplica = isReplica
 }
 
+func (rs *RedisConfig) SetMasterHostAddress(hostAddress string) {
+	rs.MasterHost = hostAddress
+}
+
 func StartRedisConfig() *RedisConfig {
 	return &RedisConfig{
 		isReplica:        false,
+		MasterHost:       "",
 		masterReplId:     "",
 		masterReplOffset: 0,
 	}

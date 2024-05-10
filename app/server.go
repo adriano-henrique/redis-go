@@ -6,7 +6,9 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 
+	"github.com/codecrafters-io/redis-starter-go/app/connection"
 	"github.com/codecrafters-io/redis-starter-go/app/utils"
 )
 
@@ -22,6 +24,12 @@ func main() {
 
 	if *replicaOf != "" {
 		redisConfig.SetIsReplica(true)
+		if len(flag.Args()) < 1 {
+			fmt.Println("Should pass port of master host")
+			os.Exit(1)
+		}
+		redisConfig.SetMasterHostAddress(strings.Join([]string{*replicaOf, flag.Args()[0]}, ":"))
+		connection.OpenConnection(redisConfig.MasterHost)
 	}
 	redisConfig.ConfigRedis()
 	l, err := net.Listen("tcp", "0.0.0.0:"+portFlag)
