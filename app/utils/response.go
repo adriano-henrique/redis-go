@@ -10,10 +10,10 @@ type ResponseType int64
 
 const (
 	Ok ResponseType = iota
-	Pong
 	Invalid
 	BulkString
 	ArrayResponse
+	SimpleString
 )
 
 type RedisResponse struct {
@@ -31,11 +31,15 @@ func NewRedisResponse(responseType ResponseType, elements []string) *RedisRespon
 func (rs *RedisResponse) GetEncodedResponse() (string, error) {
 	switch rs.responseType {
 	case Ok:
-		return "+OK\r\n", nil
+		return encodeSimpleString("OK"), nil
 	case Invalid:
 		return "$-1\r\n", nil
-	case Pong:
-		return "+PONG\r\n", nil
+	case SimpleString:
+		if len(rs.elements) == 0 {
+			return "", errors.New("elements to build the response should be passed")
+		}
+		element := rs.elements[0]
+		return encodeSimpleString(element), nil
 	case BulkString:
 		if len(rs.elements) == 0 {
 			return "", errors.New("elements to build the response should be passed")
@@ -64,4 +68,8 @@ func (rs *RedisResponse) GetEncodedResponse() (string, error) {
 
 func encodeRedisBulkString(value string) string {
 	return fmt.Sprintf("$%d\r\n%s\r\n", len(value), value)
+}
+
+func encodeSimpleString(value string) string {
+	return fmt.Sprintf("+%s\r\n", value)
 }

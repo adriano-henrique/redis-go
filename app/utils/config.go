@@ -5,8 +5,8 @@ import "fmt"
 type RedisConfig struct {
 	isReplica        bool
 	MasterHost       string
-	masterReplId     string
-	masterReplOffset int
+	MasterReplId     string
+	MasterReplOffset int
 }
 
 func (rs *RedisConfig) SetIsReplica(isReplica bool) {
@@ -21,13 +21,13 @@ func StartRedisConfig() *RedisConfig {
 	return &RedisConfig{
 		isReplica:        false,
 		MasterHost:       "",
-		masterReplId:     "",
-		masterReplOffset: 0,
+		MasterReplId:     "",
+		MasterReplOffset: 0,
 	}
 }
 
 func (rs *RedisConfig) ConfigRedis() {
-	rs.masterReplId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
+	rs.MasterReplId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
 }
 
 func (rs RedisConfig) getRole() string {
@@ -42,9 +42,9 @@ func (rs RedisConfig) GetRoleInfoString() string {
 }
 
 func (rs RedisConfig) GetMasterReplIdString() string {
-	return fmt.Sprintf("master_replid:%s", rs.masterReplId)
+	return fmt.Sprintf("master_replid:%s", rs.MasterReplId)
 }
 
 func (rs RedisConfig) GetMasterReplOffsetString() string {
-	return fmt.Sprintf("master_repl_offset:%d", rs.masterReplOffset)
+	return fmt.Sprintf("master_repl_offset:%d", rs.MasterReplOffset)
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/codecrafters-io/redis-starter-go/app/utils"
 )
 
-var validOperations = []string{"ping", "echo", "get", "set", "info", "replconf"}
+var validOperations = []string{"ping", "echo", "get", "set", "info", "replconf", "psync"}
 
 func AppendResponse(responses *[]string, operation operations.RedisOperation) {
 	response, err := operation.HandleOperation()
@@ -45,6 +45,9 @@ func ParseElements(elements []string, storage *utils.RedisStorage, config *utils
 			case "replconf":
 				replConfOperation := operations.ReplConfOperation{}
 				AppendResponse(&responses, replConfOperation)
+			case "psync":
+				psyncOperation := operations.NewPsyncOperation(config)
+				AppendResponse(&responses, psyncOperation)
 			}
 		}
 	}
