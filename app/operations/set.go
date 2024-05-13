@@ -46,3 +46,7 @@ func (so SetOperation) HandleOperation() (string, error) {
 	so.storage.Set(keyElement, storedObject)
 	return utils.OkResponse().GetEncodedResponse()
 }
+
+func (so SetOperation) HandleOperationMultipleResponses() ([]string, error) {
+	return []string{}, nil
+}

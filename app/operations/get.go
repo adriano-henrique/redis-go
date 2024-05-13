@@ -41,3 +41,7 @@ func (gop GetOperation) HandleOperation() (string, error) {
 	getResponse := utils.NewRedisResponse(utils.BulkString, []string{object.Value()})
 	return getResponse.GetEncodedResponse()
 }
+
+func (gop GetOperation) HandleOperationMultipleResponses() ([]string, error) {
+	return []string{}, nil
+}

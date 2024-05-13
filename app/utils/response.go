@@ -14,6 +14,7 @@ const (
 	BulkString
 	ArrayResponse
 	SimpleString
+	FileResponse
 )
 
 type RedisResponse struct {
@@ -46,6 +47,12 @@ func (rs *RedisResponse) GetEncodedResponse() (string, error) {
 		}
 		element := rs.elements[0]
 		return encodeRedisBulkString(element), nil
+	case FileResponse:
+		if len(rs.elements) == 0 {
+			return "", errors.New("elements to build the response should be passed")
+		}
+		element := rs.elements[0]
+		return encodeFileString(element), nil
 	case ArrayResponse:
 		if len(rs.elements) <= 1 {
 			return "", errors.New("incorrect value passed, expected more than 1 element")
@@ -64,6 +71,10 @@ func (rs *RedisResponse) GetEncodedResponse() (string, error) {
 	}
 
 	return "", errors.New("invalid reponse type")
+}
+
+func encodeFileString(value string) string {
+	return fmt.Sprintf("$%d\r\n%s", len(value), value)
 }
 
 func encodeRedisBulkString(value string) string {

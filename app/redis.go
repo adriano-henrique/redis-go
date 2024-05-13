@@ -15,10 +15,19 @@ var validOperations = []string{"ping", "echo", "get", "set", "info", "replconf",
 func AppendResponse(responses *[]string, operation operations.RedisOperation) {
 	response, err := operation.HandleOperation()
 	if err != nil {
-		fmt.Println("Error during operation partsing: ", err.Error())
+		fmt.Println("Error during operation parsing: ", err.Error())
 		os.Exit(1)
 	}
 	*responses = append(*responses, response)
+}
+
+func AppendResponses(responses *[]string, operation operations.RedisOperation) {
+	additionalResponses, err := operation.HandleOperationMultipleResponses()
+	if err != nil {
+		fmt.Println("Error during operation parsing: ", err.Error())
+		os.Exit(1)
+	}
+	*responses = append(*responses, additionalResponses...)
 }
 
 func ParseElements(elements []string, storage *utils.RedisStorage, config *utils.RedisConfig) []string {
@@ -47,7 +56,7 @@ func ParseElements(elements []string, storage *utils.RedisStorage, config *utils
 				AppendResponse(&responses, replConfOperation)
 			case "psync":
 				psyncOperation := operations.NewPsyncOperation(config)
-				AppendResponse(&responses, psyncOperation)
+				AppendResponses(&responses, psyncOperation)
 			}
 		}
 	}

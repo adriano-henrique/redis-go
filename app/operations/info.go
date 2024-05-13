@@ -32,3 +32,7 @@ func (io InfoOperation) buildResponseElements() []string {
 func (io InfoOperation) buildResponseString() string {
 	return strings.Join(io.buildResponseElements(), "\n")
 }
+
+func (io InfoOperation) HandleOperationMultipleResponses() ([]string, error) {
+	return []string{}, nil
+}

@@ -26,3 +26,7 @@ func (eo EchoOperation) HandleOperation() (string, error) {
 	echoResponse := utils.NewRedisResponse(utils.BulkString, []string{peekElement})
 	return echoResponse.GetEncodedResponse()
 }
+
+func (eo EchoOperation) HandleOperationMultipleResponses() ([]string, error) {
+	return []string{}, nil
+}
