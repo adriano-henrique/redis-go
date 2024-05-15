@@ -20,7 +20,6 @@ func main() {
 
 	replicaOf := flag.String("replicaof", "", "replicate to another redis server")
 	flag.Parse()
-	fmt.Println(flag.Args())
 
 	if *replicaOf != "" {
 		redisConfig.SetIsReplica(true)
@@ -66,7 +65,7 @@ func handleConnection(conn net.Conn, storage *utils.RedisStorage, config *utils.
 
 		requestContent := string(readBuffer)
 		requestElements := ParseRequest(requestContent)
-		responses := ParseElements(requestElements, storage, config)
+		responses := ParseElements(requestElements, storage, config, conn)
 		for _, response := range responses {
 			res := []byte(response)
 			n, err := conn.Write(res)

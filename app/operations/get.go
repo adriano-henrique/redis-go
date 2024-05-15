@@ -2,7 +2,6 @@ package operations
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/codecrafters-io/redis-starter-go/app/utils"
 )
@@ -27,8 +26,6 @@ func (gop GetOperation) HandleOperation() (string, error) {
 	}
 	keyElement := gop.elements[gop.index+1]
 	object, err := gop.storage.Get(keyElement)
-	fmt.Println("Got: ", object.Value())
-	fmt.Println("Got: ", object.Expiry().String())
 	if err != nil {
 		return "$-1\r\n", nil
 	}

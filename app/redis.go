@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"slices"
 	"strings"
 
+	"github.com/codecrafters-io/redis-starter-go/app/connection"
 	"github.com/codecrafters-io/redis-starter-go/app/operations"
 	"github.com/codecrafters-io/redis-starter-go/app/utils"
 )
@@ -30,7 +32,7 @@ func AppendResponses(responses *[]string, operation operations.RedisOperation) {
 	*responses = append(*responses, additionalResponses...)
 }
 
-func ParseElements(elements []string, storage *utils.RedisStorage, config *utils.RedisConfig) []string {
+func ParseElements(elements []string, storage *utils.RedisStorage, config *utils.RedisConfig, conn net.Conn) []string {
 	var responses []string
 	for i, element := range elements {
 		lowerCaseValue := strings.ToLower(element)
@@ -45,9 +47,11 @@ func ParseElements(elements []string, storage *utils.RedisStorage, config *utils
 			case "get":
 				getOperation := operations.NewGetOperation(i, elements, storage)
 				AppendResponse(&responses, getOperation)
+				propagateCommand(config, elements)
 			case "set":
 				setOperation := operations.NewSetOperation(i, elements, storage)
 				AppendResponse(&responses, setOperation)
+				propagateCommand(config, elements)
 			case "info":
 				infoOperation := operations.NewInfoOperation(config)
 				AppendResponse(&responses, infoOperation)
@@ -57,8 +61,15 @@ func ParseElements(elements []string, storage *utils.RedisStorage, config *utils
 			case "psync":
 				psyncOperation := operations.NewPsyncOperation(config)
 				AppendResponses(&responses, psyncOperation)
+				config.AddReplica(conn)
 			}
 		}
 	}
 	return responses
+}
+
+func propagateCommand(config *utils.RedisConfig, elements []string) {
+	for _, conn := range config.ReplicaConnections {
+		conn.Write(connection.WriteBulkString(elements))
+	}
 }

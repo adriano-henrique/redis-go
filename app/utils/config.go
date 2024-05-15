@@ -1,12 +1,16 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+)
 
 type RedisConfig struct {
-	isReplica        bool
-	MasterHost       string
-	MasterReplId     string
-	MasterReplOffset int
+	isReplica          bool
+	MasterHost         string
+	MasterReplId       string
+	MasterReplOffset   int
+	ReplicaConnections []net.Conn
 }
 
 func (rs *RedisConfig) SetIsReplica(isReplica bool) {
@@ -19,15 +23,20 @@ func (rs *RedisConfig) SetMasterHostAddress(hostAddress string) {
 
 func StartRedisConfig() *RedisConfig {
 	return &RedisConfig{
-		isReplica:        false,
-		MasterHost:       "",
-		MasterReplId:     "",
-		MasterReplOffset: 0,
+		isReplica:          false,
+		MasterHost:         "",
+		MasterReplId:       "",
+		MasterReplOffset:   0,
+		ReplicaConnections: make([]net.Conn, 0),
 	}
 }
 
 func (rs *RedisConfig) ConfigRedis() {
 	rs.MasterReplId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb"
+}
+
+func (rs *RedisConfig) AddReplica(conn net.Conn) {
+	rs.ReplicaConnections = append(rs.ReplicaConnections, conn)
 }
 
 func (rs RedisConfig) getRole() string {

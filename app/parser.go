@@ -9,14 +9,12 @@ import (
 
 func ParseRequest(requestContent string) []string {
 	numElements, err := strconv.Atoi(string(requestContent[1]))
-	fmt.Println(requestContent)
 	if err != nil {
 		fmt.Println("Unable to parse number of elements - should be number. Error: ", err.Error())
 		os.Exit(1)
 	}
 	requestElementsList := make([]string, numElements)
 	request := getRequestElementsList(requestContent)
-	fmt.Println(request)
 
 	currDataIndex := 1
 	for i := 0; i < numElements; i++ {
